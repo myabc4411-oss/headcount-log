@@ -9,12 +9,17 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f0;color:#1a1a1a;min-height:100vh;padding:2rem 1rem}
 .wrap{max-width:760px;margin:0 auto}
-.header{display:flex;align-items:center;gap:10px;margin-bottom:1.5rem}
+.header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:1.5rem}
+.header-left{display:flex;align-items:center;gap:10px}
 .logo{width:36px;height:36px;background:#1D9E75;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;flex-shrink:0}
 .h-title{font-size:20px;font-weight:600;color:#111}
 .h-sub{font-size:12px;color:#888;margin-top:2px}
+.sync-status{font-size:11px;padding:3px 8px;border-radius:6px;font-weight:500}
+.sync-status.ok{background:#E1F5EE;color:#0F6E56}
+.sync-status.loading{background:#fff3cd;color:#856404}
+.sync-status.error{background:#fde8e8;color:#a32d2d}
 .tabs-wrap{display:flex;align-items:center;border-bottom:1px solid #e0e0d8;margin-bottom:1.25rem}
-.tabs-scroll{display:flex;align-items:flex-end;flex:1;overflow-x:auto;gap:0;scrollbar-width:none}
+.tabs-scroll{display:flex;align-items:flex-end;flex:1;overflow-x:auto;scrollbar-width:none}
 .tabs-scroll::-webkit-scrollbar{display:none}
 .tab{padding:9px 16px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:none;color:#888;border-bottom:2px solid transparent;margin-bottom:-1px;display:flex;align-items:center;gap:5px;transition:all .15s;white-space:nowrap;flex-shrink:0}
 .tab.active{color:#0F6E56;border-bottom-color:#1D9E75}
@@ -22,9 +27,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .tab-name{max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cnt{font-size:11px;background:#eee;color:#666;border-radius:10px;padding:1px 6px;font-weight:400}
 .tab.active .cnt{background:#E1F5EE;color:#0F6E56}
-.tab-del{font-size:12px;color:#ccc;padding:1px 3px;border-radius:3px;cursor:pointer;transition:color .15s;line-height:1;background:none;border:none;margin-left:2px}
+.tab-del{font-size:12px;color:#ccc;padding:1px 3px;border-radius:3px;cursor:pointer;line-height:1;background:none;border:none;margin-left:2px}
 .tab-del:hover{color:#c0392b}
-.btn-addtab{display:flex;align-items:center;gap:4px;padding:7px 10px;border:none;background:none;color:#aaa;font-size:12px;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:color .15s;margin-bottom:1px}
+.btn-addtab{display:flex;align-items:center;gap:4px;padding:7px 12px;border:none;background:none;color:#aaa;font-size:12px;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:color .15s}
 .btn-addtab:hover{color:#0F6E56}
 .panel{display:none}.panel.active{display:block}
 .layout{display:grid;grid-template-columns:175px 1fr;gap:12px;min-height:280px}
@@ -72,6 +77,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .empty i{font-size:28px;display:block;margin-bottom:.5rem;opacity:.4}
 .no-sg{text-align:center;padding:3rem 1rem;color:#bbb;font-size:13px}
 .no-sg i{font-size:32px;display:block;margin-bottom:.6rem;opacity:.3}
+.no-cat{text-align:center;padding:4rem 1rem;color:#bbb;font-size:13px}
+.no-cat i{font-size:36px;display:block;margin-bottom:.75rem;opacity:.3}
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:100;display:flex;align-items:center;justify-content:center}
 .modal{background:#fff;border-radius:12px;border:1px solid #e8e8e0;width:340px;padding:1.25rem}
 .modal h3{font-size:15px;font-weight:600;margin-bottom:.4rem;color:#111}
@@ -86,8 +93,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .btn-confirm:hover{background:#0F6E56}
 .btn-confirm.danger{background:#c0392b}
 .btn-confirm.danger:hover{background:#a93226}
-.shake{animation:shake .3s ease}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.shake{animation:shake .3s ease}
 .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#1D9E75;color:#fff;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:500;z-index:200;opacity:0;transition:opacity .25s;pointer-events:none}
 .toast.show{opacity:1}
 @media(max-width:540px){.layout{grid-template-columns:1fr}.add-row{grid-template-columns:1fr 1fr}.btn-add{grid-column:span 2}}
@@ -96,155 +103,153 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <body>
 <div class="wrap">
   <div class="header">
-    <div class="logo"><i class="ti ti-users"></i></div>
-    <div>
-      <div class="h-title">headcount-log</div>
-      <div class="h-sub">카테고리 → 그룹 → 날짜별 인원 기록</div>
+    <div class="header-left">
+      <div class="logo"><i class="ti ti-users"></i></div>
+      <div>
+        <div class="h-title">headcount-log</div>
+        <div class="h-sub">카테고리 → 그룹 → 날짜별 인원 기록</div>
+      </div>
     </div>
+    <div id="sync-status" class="sync-status loading">⏳ 불러오는 중...</div>
   </div>
   <div class="tabs-wrap">
     <div class="tabs-scroll" id="tabs-scroll"></div>
-    <button class="btn-addtab" onclick="openModal('cat')"><i class="ti ti-plus" style="font-size:14px"></i>카테고리 추가</button>
+    <button class="btn-addtab" id="btn-addtab"><i class="ti ti-plus" style="font-size:13px"></i> 카테고리 추가</button>
   </div>
   <div id="panels"></div>
 </div>
 
-<div id="modal" style="display:none" class="modal-bg" onclick="closeMbg(event)">
+<div id="modal" style="display:none" class="modal-bg">
   <div class="modal">
     <h3 id="modal-title"></h3>
     <div class="modal-desc" id="modal-desc"></div>
     <input id="modal-input" type="text" maxlength="30">
     <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeModal()">취소</button>
-      <button class="btn-confirm" id="modal-confirm-btn" onclick="confirmModal()">확인</button>
+      <button class="btn-cancel" id="modal-cancel">취소</button>
+      <button class="btn-confirm" id="modal-confirm">확인</button>
     </div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
 
 <script>
-let state={
-  cats:[{id:'biz',name:'사업'},{id:'club',name:'동아리'},{id:'reg',name:'정기형'}],
-  data:{biz:{groups:[],records:{}},club:{groups:[],records:{}},reg:{groups:[],records:{}}}
-};
-let curCat='biz',curSg={},filters={};
-let modalMode=null,modalCat=null,modalDelTarget=null;
+var API_URL = 'https://script.google.com/macros/s/AKfycbzI2VU4Av7gI-hGdRluYj_KnXX6aG6muKmppOIIdQTTuNgjTBegyEVrNyw24CFsXphrjQ/exec';
+var state = {cats:[], data:{}};
+var curCat='', curSg={}, filters={};
+var modalMode=null, modalCat=null, modalDelTarget=null;
+var DEFAULT_CATS=[{id:'biz',name:'사업'},{id:'club',name:'동아리'},{id:'reg',name:'정기형'}];
 
-function load(){
-  try{const raw=localStorage.getItem('headcount-v3');if(raw)state=JSON.parse(raw);}catch(e){}
-  state.cats.forEach(c=>{
+function setStatus(type,msg){var el=document.getElementById('sync-status');el.className='sync-status '+type;el.textContent=msg;}
+function stateToRows(){return[[JSON.stringify(state)]];}
+function rowsToState(rows){if(!rows||!rows.length||!rows[0][0])return null;try{return JSON.parse(rows[0][0]);}catch(e){return null;}}
+
+function loadFromSheet(){
+  setStatus('loading','⏳ 불러오는 중...');
+  fetch(API_URL+'?action=load')
+    .then(function(r){return r.json();})
+    .then(function(res){
+      if(res.ok&&res.data){var p=rowsToState(res.data);if(p&&p.cats&&p.cats.length){state=p;}else{initDefault();}}
+      else{initDefault();}
+      afterLoad();setStatus('ok','✅ 동기화됨');
+    })
+    .catch(function(){initDefault();afterLoad();setStatus('error','⚠️ 오프라인 모드');});
+}
+
+function saveToSheet(){
+  setStatus('loading','💾 저장 중...');
+  var payload=JSON.stringify(stateToRows());
+  fetch(API_URL+'?action=save&payload='+encodeURIComponent(payload))
+    .then(function(r){return r.json();})
+    .then(function(res){setStatus(res.ok?'ok':'error',res.ok?'✅ 저장됨':'⚠️ 저장 실패');})
+    .catch(function(){setStatus('error','⚠️ 저장 실패');});
+}
+
+function initDefault(){state={cats:DEFAULT_CATS.slice(),data:{}};state.cats.forEach(function(c){state.data[c.id]={groups:[],records:{}};});}
+
+function afterLoad(){
+  state.cats.forEach(function(c){
     if(!state.data[c.id])state.data[c.id]={groups:[],records:{}};
     if(!curSg[c.id]&&state.data[c.id].groups.length)curSg[c.id]=state.data[c.id].groups[0].id;
     if(!filters[c.id])filters[c.id]={from:'',to:''};
   });
-  if(!state.cats.find(c=>c.id===curCat))curCat=state.cats[0]?.id||'';
+  if(!curCat||!state.cats.find(function(c){return c.id===curCat;}))curCat=state.cats.length?state.cats[0].id:'';
   render();
 }
 
-function persist(){try{localStorage.setItem('headcount-v3',JSON.stringify(state));}catch(e){}}
+function persist(){saveToSheet();}
 function today(){return new Date().toISOString().slice(0,10);}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function totalRec(catId){return Object.values(state.data[catId]?.records||{}).reduce((s,a)=>s+a.length,0);}
-function applyFilter(recs,catId){
-  const f=filters[catId]||{};
-  return recs.filter(r=>{
-    if(f.from&&r.date<f.from)return false;
-    if(f.to&&r.date>f.to)return false;
-    return true;
-  });
-}
+function totalRec(catId){var r=state.data[catId]&&state.data[catId].records?state.data[catId].records:{};return Object.values(r).reduce(function(s,a){return s+a.length;},0);}
+function applyFilter(recs,catId){var f=filters[catId]||{};return recs.filter(function(r){if(f.from&&r.date<f.from)return false;if(f.to&&r.date>f.to)return false;return true;});}
 
 function render(){renderTabs();renderPanels();}
 
 function renderTabs(){
-  document.getElementById('tabs-scroll').innerHTML=state.cats.map(c=>`
-    <button class="tab${curCat===c.id?' active':''}" onclick="switchCat('${c.id}')">
-      <span class="tab-name">${esc(c.name)}</span>
-      <span class="cnt">${totalRec(c.id)}</span>
-      <button class="tab-del" onclick="event.stopPropagation();openDel('cat','${c.id}')" title="삭제">×</button>
-    </button>`).join('');
+  document.getElementById('tabs-scroll').innerHTML=state.cats.map(function(c){
+    return '<button class="tab'+(curCat===c.id?' active':'')+'" data-cat="'+c.id+'">'
+      +'<span class="tab-name">'+esc(c.name)+'</span>'
+      +'<span class="cnt">'+totalRec(c.id)+'</span>'
+      +'<span class="tab-del" data-del="'+c.id+'" title="삭제">×</span>'
+      +'</button>';
+  }).join('');
+  document.querySelectorAll('.tab').forEach(function(btn){
+    btn.addEventListener('click',function(e){if(e.target.classList.contains('tab-del'))return;switchCat(btn.getAttribute('data-cat'));});
+  });
+  document.querySelectorAll('.tab-del').forEach(function(span){
+    span.addEventListener('click',function(e){e.stopPropagation();openDel('cat',span.getAttribute('data-del'));});
+  });
 }
 
 function renderPanels(){
-  document.getElementById('panels').innerHTML=state.cats.map(c=>
-    `<div id="panel-${c.id}" class="panel${curCat===c.id?' active':''}">${buildPanel(c.id)}</div>`
-  ).join('');
+  if(!state.cats.length){document.getElementById('panels').innerHTML='<div class="no-cat"><i class="ti ti-layout-grid-add"></i>위의 "+ 카테고리 추가" 버튼으로 카테고리를 만들어 보세요</div>';return;}
+  document.getElementById('panels').innerHTML=state.cats.map(function(c){
+    return '<div id="panel-'+c.id+'" class="panel'+(curCat===c.id?' active':'')+'">'+buildPanel(c.id)+'</div>';
+  }).join('');
+  state.cats.forEach(function(c){
+    var panel=document.getElementById('panel-'+c.id);if(!panel)return;
+    panel.querySelectorAll('.sg-item').forEach(function(el){el.addEventListener('click',function(){selectSg(el.getAttribute('data-cat'),el.getAttribute('data-sg'));});});
+    var addSgBtn=panel.querySelector('.btn-addsg');if(addSgBtn)addSgBtn.addEventListener('click',function(){openModal('sg',c.id);});
+    var delSgBtn=panel.querySelector('.btn-delsg');if(delSgBtn)delSgBtn.addEventListener('click',function(){openDel('sg',delSgBtn.getAttribute('data-cat'),delSgBtn.getAttribute('data-sg'));});
+    var addRecBtn=panel.querySelector('.btn-add');if(addRecBtn)addRecBtn.addEventListener('click',function(){addRecord(addRecBtn.getAttribute('data-cat'),addRecBtn.getAttribute('data-sg'));});
+    panel.querySelectorAll('.btn-del').forEach(function(btn){btn.addEventListener('click',function(){delRecord(btn.getAttribute('data-cat'),btn.getAttribute('data-sg'),btn.getAttribute('data-rec'));});});
+    var fi=panel.querySelector('.filter-from'),ti=panel.querySelector('.filter-to');
+    if(fi)fi.addEventListener('change',function(){setFilter(c.id,'from',fi.value);});
+    if(ti)ti.addEventListener('change',function(){setFilter(c.id,'to',ti.value);});
+    var rb=panel.querySelector('.btn-reset');if(rb)rb.addEventListener('click',function(){resetFilter(c.id);});
+  });
 }
 
 function buildPanel(catId){
-  const d=state.data[catId]||{groups:[],records:{}};
-  const {groups,records}=d;
-  const activeSg=curSg[catId];
-  const f=filters[catId]||{from:'',to:''};
-  const hasFilter=f.from||f.to;
-
-  const sidebarItems=groups.map(g=>{
-    const cnt=applyFilter(records[g.id]||[],catId).length;
-    return `<div class="sg-item${activeSg===g.id?' active':''}" onclick="selectSg('${catId}','${g.id}')">
-      <span class="sg-name">${esc(g.name)}</span>
-      <span class="sg-cnt">${cnt}</span>
-    </div>`;
+  var d=state.data[catId]||{groups:[],records:{}};
+  var groups=d.groups,records=d.records,activeSg=curSg[catId];
+  var f=filters[catId]||{from:'',to:''},hasFilter=f.from||f.to;
+  var sidebarHtml=groups.map(function(g){
+    var cnt=applyFilter(records[g.id]||[],catId).length;
+    return '<div class="sg-item'+(activeSg===g.id?' active':'')+'" data-cat="'+catId+'" data-sg="'+g.id+'"><span class="sg-name">'+esc(g.name)+'</span><span class="sg-cnt">'+cnt+'</span></div>';
   }).join('');
-
-  let contentHtml='';
-  if(!groups.length){
-    contentHtml=`<div class="no-sg"><i class="ti ti-folder-plus"></i>왼쪽에서 그룹을 먼저 추가해 주세요</div>`;
-  } else if(!activeSg||!groups.find(g=>g.id===activeSg)){
-    contentHtml=`<div class="no-sg"><i class="ti ti-hand-click"></i>왼쪽에서 그룹을 선택하세요</div>`;
-  } else {
-    const g=groups.find(g=>g.id===activeSg);
-    const recs=applyFilter(records[activeSg]||[],catId);
-    const total=recs.reduce((s,r)=>s+Number(r.count||0),0);
-    const avg=recs.length?Math.round(total/recs.length):0;
-    const max=recs.length?Math.max(...recs.map(r=>Number(r.count||0))):0;
-    const sorted=[...recs].sort((a,b)=>b.date.localeCompare(a.date));
-    const filterTag=hasFilter?`<span class="filter-tag">${f.from||'처음'}~${f.to||'오늘'} · ${recs.length}건</span>`:'';
-
-    contentHtml=`
-      <div class="sg-header">
-        <div class="sg-title">${esc(g.name)}</div>
-        <button class="btn-delsg" onclick="openDel('sg','${catId}','${activeSg}')"><i class="ti ti-trash"></i> 그룹 삭제</button>
-      </div>
-      <div class="add-card">
-        <div class="add-row">
-          <div class="field-g"><label>날짜</label><input type="date" id="d-${catId}" value="${today()}"></div>
-          <div class="field-g"><label>행사 / 모임명</label><input type="text" id="n-${catId}" placeholder="예) 5월 정기전"></div>
-          <div class="field-g"><label>인원 수</label><input type="number" id="c-${catId}" placeholder="0" min="0" style="text-align:center"></div>
-          <button class="btn-add" onclick="addRecord('${catId}','${activeSg}')"><i class="ti ti-plus"></i>추가</button>
-        </div>
-      </div>
-      <div class="filter-bar">
-        <label>기간 필터</label>
-        <input type="date" value="${f.from}" onchange="setFilter('${catId}','from',this.value)">
-        <span class="filter-sep">~</span>
-        <input type="date" value="${f.to}" onchange="setFilter('${catId}','to',this.value)">
-        ${filterTag}
-        ${hasFilter?`<button class="btn-reset" onclick="resetFilter('${catId}')">초기화</button>`:''}
-      </div>
-      ${recs.length?`<div class="summary-row">
-        <div class="stat"><div class="stat-label">누적 인원${hasFilter?' (필터)':''}</div><div class="stat-val">${total.toLocaleString()}<span class="stat-unit"> 명</span></div></div>
-        <div class="stat"><div class="stat-label">평균 인원</div><div class="stat-val">${avg}<span class="stat-unit"> 명</span></div></div>
-        <div class="stat"><div class="stat-label">최대 인원</div><div class="stat-val">${max}<span class="stat-unit"> 명</span></div></div>
-      </div>`:''}
-      <div class="records-list">
-        ${sorted.length?sorted.map(r=>`
-          <div class="rec">
-            <div class="rec-date">${r.date}</div>
-            <div class="rec-name">${esc(r.name)}</div>
-            <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-              <div class="rec-count">${Number(r.count).toLocaleString()}<span class="rec-unit"> 명</span></div>
-              <button class="btn-del" onclick="delRecord('${catId}','${activeSg}','${r.id}')"><i class="ti ti-trash"></i></button>
-            </div>
-          </div>`).join('')
-        :`<div class="empty"><i class="ti ti-calendar-off"></i>${hasFilter?'해당 기간에 기록이 없어요':'아직 기록이 없어요'}</div>`}
-      </div>`;
+  var contentHtml='';
+  if(!groups.length){contentHtml='<div class="no-sg"><i class="ti ti-folder-plus"></i>왼쪽에서 그룹을 먼저 추가해 주세요</div>';}
+  else if(!activeSg||!groups.find(function(g){return g.id===activeSg;})){contentHtml='<div class="no-sg"><i class="ti ti-hand-click"></i>왼쪽에서 그룹을 선택하세요</div>';}
+  else{
+    var g=groups.find(function(g){return g.id===activeSg;});
+    var recs=applyFilter(records[activeSg]||[],catId);
+    var total=recs.reduce(function(s,r){return s+Number(r.count||0);},0);
+    var avg=recs.length?Math.round(total/recs.length):0;
+    var max=recs.length?Math.max.apply(null,recs.map(function(r){return Number(r.count||0);})):0;
+    var sorted=recs.slice().sort(function(a,b){return b.date.localeCompare(a.date);});
+    var filterTag=hasFilter?'<span class="filter-tag">'+(f.from||'처음')+'~'+(f.to||'오늘')+' · '+recs.length+'건</span>':'';
+    contentHtml='<div class="sg-header"><div class="sg-title">'+esc(g.name)+'</div><button class="btn-delsg" data-cat="'+catId+'" data-sg="'+activeSg+'"><i class="ti ti-trash"></i> 그룹 삭제</button></div>'
+      +'<div class="add-card"><div class="add-row">'
+      +'<div class="field-g"><label>날짜</label><input type="date" id="d-'+catId+'" value="'+today()+'"></div>'
+      +'<div class="field-g"><label>행사 / 모임명</label><input type="text" id="n-'+catId+'" placeholder="예) 5월 정기전"></div>'
+      +'<div class="field-g"><label>인원 수</label><input type="number" id="c-'+catId+'" placeholder="0" min="0" style="text-align:center"></div>'
+      +'<button class="btn-add" data-cat="'+catId+'" data-sg="'+activeSg+'"><i class="ti ti-plus"></i>추가</button>'
+      +'</div></div>'
+      +'<div class="filter-bar"><label>기간 필터</label><input type="date" class="filter-from" value="'+f.from+'"><span class="filter-sep">~</span><input type="date" class="filter-to" value="'+f.to+'">'+filterTag+(hasFilter?'<button class="btn-reset">초기화</button>':'')+'</div>'
+      +(recs.length?'<div class="summary-row"><div class="stat"><div class="stat-label">누적 인원'+(hasFilter?' (필터)':'')+'</div><div class="stat-val">'+total.toLocaleString()+'<span class="stat-unit"> 명</span></div></div><div class="stat"><div class="stat-label">평균 인원</div><div class="stat-val">'+avg+'<span class="stat-unit"> 명</span></div></div><div class="stat"><div class="stat-label">최대 인원</div><div class="stat-val">'+max+'<span class="stat-unit"> 명</span></div></div></div>':'')
+      +'<div class="records-list">'+(sorted.length?sorted.map(function(r){return '<div class="rec"><div class="rec-date">'+r.date+'</div><div class="rec-name">'+esc(r.name)+'</div><div style="display:flex;align-items:center;gap:6px;flex-shrink:0"><div class="rec-count">'+Number(r.count).toLocaleString()+'<span class="rec-unit"> 명</span></div><button class="btn-del" data-cat="'+catId+'" data-sg="'+activeSg+'" data-rec="'+r.id+'"><i class="ti ti-trash"></i></button></div></div>';}).join(''):'<div class="empty"><i class="ti ti-calendar-off"></i>'+(hasFilter?'해당 기간에 기록이 없어요':'아직 기록이 없어요')+'</div>')+'</div>';
   }
-  return `<div class="layout">
-    <div class="sidebar">${sidebarItems}
-      <button class="btn-addsg" onclick="openModal('sg','${catId}')"><i class="ti ti-plus" style="font-size:13px"></i>그룹 추가</button>
-    </div>
-    <div class="content">${contentHtml}</div>
-  </div>`;
+  return '<div class="layout"><div class="sidebar">'+sidebarHtml+'<button class="btn-addsg"><i class="ti ti-plus" style="font-size:13px"></i>그룹 추가</button></div><div class="content">'+contentHtml+'</div></div>';
 }
 
 function switchCat(catId){curCat=catId;render();}
@@ -252,124 +257,76 @@ function selectSg(catId,sgId){curSg[catId]=sgId;renderPanels();}
 function setFilter(catId,key,val){if(!filters[catId])filters[catId]={};filters[catId][key]=val;renderPanels();}
 function resetFilter(catId){filters[catId]={from:'',to:''};renderPanels();}
 
-// 삭제 모달 열기 (카테고리 & 그룹 공통)
-function openDel(type,catId,sgId){
-  modalMode='del-'+type;
-  modalCat=catId;
-  modalDelTarget=sgId||null;
-  let targetName='',recCount=0;
-  if(type==='cat'){
-    targetName=state.cats.find(c=>c.id===catId).name;
-    recCount=totalRec(catId);
-  } else {
-    targetName=state.data[catId].groups.find(g=>g.id===sgId).name;
-    recCount=(state.data[catId].records[sgId]||[]).length;
-  }
-  const label=type==='cat'?'카테고리':'그룹';
-  document.getElementById('modal-title').textContent=`${label} 삭제`;
-  document.getElementById('modal-desc').innerHTML=
-    `<strong>"${esc(targetName)}"</strong> ${label}${recCount>0?`와 모든 기록 <strong>${recCount}건</strong>`:''}을 삭제하려면<br>${label} 이름을 정확히 입력하세요.`;
-  document.getElementById('modal-input').value='';
-  document.getElementById('modal-input').placeholder=targetName;
-  document.getElementById('modal-input').classList.remove('error');
-  document.getElementById('modal-confirm-btn').textContent='삭제';
-  document.getElementById('modal-confirm-btn').className='btn-confirm danger';
-  document.getElementById('modal').style.display='flex';
-  setTimeout(()=>document.getElementById('modal-input').focus(),50);
-}
-
-function openModal(mode,catId){
-  modalMode=mode;
-  modalCat=catId||null;
-  document.getElementById('modal-title').textContent=mode==='cat'?'카테고리 추가':'그룹 추가';
-  document.getElementById('modal-desc').textContent='';
-  document.getElementById('modal-input').value='';
-  document.getElementById('modal-input').placeholder=mode==='cat'?'예) 봉사활동':'예) 농구동아리';
-  document.getElementById('modal-input').classList.remove('error');
-  document.getElementById('modal-confirm-btn').textContent='추가';
-  document.getElementById('modal-confirm-btn').className='btn-confirm';
-  document.getElementById('modal').style.display='flex';
-  setTimeout(()=>document.getElementById('modal-input').focus(),50);
-}
-
-function closeModal(){document.getElementById('modal').style.display='none';}
-function closeMbg(e){if(e.target.id==='modal')closeModal();}
-
-function confirmModal(){
-  const val=document.getElementById('modal-input').value.trim();
-  const inp=document.getElementById('modal-input');
-
-  if(modalMode==='del-cat'||modalMode==='del-sg'){
-    const isCat=modalMode==='del-cat';
-    const targetName=isCat
-      ?state.cats.find(c=>c.id===modalCat).name
-      :state.data[modalCat].groups.find(g=>g.id===modalDelTarget).name;
-    if(val!==targetName){
-      inp.classList.add('error');
-      inp.classList.remove('shake');void inp.offsetWidth;inp.classList.add('shake');
-      showToast('이름이 일치하지 않아요');return;
-    }
-    closeModal();
-    if(isCat){
-      state.cats=state.cats.filter(c=>c.id!==modalCat);
-      delete state.data[modalCat];delete curSg[modalCat];delete filters[modalCat];
-      curCat=state.cats[0]?.id||'';
-      persist();render();showToast('카테고리가 삭제되었습니다');
-    } else {
-      state.data[modalCat].groups=state.data[modalCat].groups.filter(g=>g.id!==modalDelTarget);
-      delete state.data[modalCat].records[modalDelTarget];
-      curSg[modalCat]=state.data[modalCat].groups[0]?.id||null;
-      persist();renderPanels();showToast('그룹이 삭제되었습니다');
-    }
-    return;
-  }
-
-  if(!val){showToast('이름을 입력해 주세요');return;}
-  if(modalMode==='cat'){
-    const id='cat-'+Date.now();
-    state.cats.push({id,name:val});
-    state.data[id]={groups:[],records:{}};
-    filters[id]={from:'',to:''};
-    curCat=id;persist();closeModal();render();
-    showToast(`"${val}" 카테고리가 추가되었습니다`);
-  } else {
-    const id='sg-'+Date.now();
-    state.data[modalCat].groups.push({id,name:val});
-    state.data[modalCat].records[id]=[];
-    curSg[modalCat]=id;persist();closeModal();renderPanels();
-    showToast(`"${val}" 그룹이 추가되었습니다`);
-  }
-}
-
 function addRecord(catId,sgId){
-  const date=document.getElementById('d-'+catId).value;
-  const name=document.getElementById('n-'+catId).value.trim();
-  const count=parseInt(document.getElementById('c-'+catId).value)||0;
+  var date=document.getElementById('d-'+catId).value;
+  var name=document.getElementById('n-'+catId).value.trim();
+  var count=parseInt(document.getElementById('c-'+catId).value)||0;
   if(!name){showToast('행사/모임명을 입력해 주세요');return;}
   if(!date){showToast('날짜를 선택해 주세요');return;}
   if(count<=0){showToast('인원 수를 입력해 주세요');return;}
   if(!state.data[catId].records[sgId])state.data[catId].records[sgId]=[];
-  state.data[catId].records[sgId].push({id:Date.now()+'',date,name,count});
+  state.data[catId].records[sgId].push({id:Date.now()+'',date:date,name:name,count:count});
   persist();renderPanels();
-  document.getElementById('n-'+catId).value='';
-  document.getElementById('c-'+catId).value='';
+  document.getElementById('n-'+catId).value='';document.getElementById('c-'+catId).value='';
   showToast('기록이 추가되었습니다');
 }
 
 function delRecord(catId,sgId,recId){
   if(!confirm('이 기록을 삭제할까요?'))return;
-  state.data[catId].records[sgId]=state.data[catId].records[sgId].filter(r=>r.id!==recId);
+  state.data[catId].records[sgId]=state.data[catId].records[sgId].filter(function(r){return r.id!==recId;});
   persist();renderPanels();showToast('삭제되었습니다');
 }
 
-function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2000);
+function openDel(type,catId,sgId){
+  modalMode='del-'+type;modalCat=catId;modalDelTarget=sgId||null;
+  var targetName='',recCount=0;
+  if(type==='cat'){var cat=state.cats.find(function(c){return c.id===catId;});targetName=cat?cat.name:'';recCount=totalRec(catId);}
+  else{var grp=state.data[catId].groups.find(function(g){return g.id===sgId;});targetName=grp?grp.name:'';recCount=(state.data[catId].records[sgId]||[]).length;}
+  var label=type==='cat'?'카테고리':'그룹';
+  document.getElementById('modal-title').textContent=label+' 삭제';
+  document.getElementById('modal-desc').innerHTML='<strong>"'+esc(targetName)+'"</strong> '+label+(recCount>0?'와 모든 기록 <strong>'+recCount+'건</strong>':'')+'을 삭제하려면<br>'+label+' 이름을 정확히 입력하세요.';
+  document.getElementById('modal-input').value='';document.getElementById('modal-input').placeholder=targetName;
+  document.getElementById('modal-input').className='';document.getElementById('modal-confirm').textContent='삭제';document.getElementById('modal-confirm').className='btn-confirm danger';
+  document.getElementById('modal').style.display='flex';setTimeout(function(){document.getElementById('modal-input').focus();},50);
 }
 
-document.getElementById('modal-input').addEventListener('keydown',e=>{if(e.key==='Enter')confirmModal();});
-load();
+function openModal(mode,catId){
+  modalMode=mode;modalCat=catId||null;
+  document.getElementById('modal-title').textContent=mode==='cat'?'카테고리 추가':'그룹 추가';
+  document.getElementById('modal-desc').textContent='';document.getElementById('modal-input').value='';
+  document.getElementById('modal-input').placeholder=mode==='cat'?'예) 봉사활동':'예) 농구동아리';
+  document.getElementById('modal-input').className='';document.getElementById('modal-confirm').textContent='추가';document.getElementById('modal-confirm').className='btn-confirm';
+  document.getElementById('modal').style.display='flex';setTimeout(function(){document.getElementById('modal-input').focus();},50);
+}
+
+function closeModal(){document.getElementById('modal').style.display='none';}
+
+function confirmModal(){
+  var val=document.getElementById('modal-input').value.trim();
+  var inp=document.getElementById('modal-input');
+  if(modalMode==='del-cat'||modalMode==='del-sg'){
+    var isCat=modalMode==='del-cat';
+    var targetName=isCat?(state.cats.find(function(c){return c.id===modalCat;})||{}).name:(state.data[modalCat].groups.find(function(g){return g.id===modalDelTarget;})||{}).name;
+    if(val!==targetName){inp.className='error';inp.classList.remove('shake');void inp.offsetWidth;inp.classList.add('shake');showToast('이름이 일치하지 않아요');return;}
+    closeModal();
+    if(isCat){state.cats=state.cats.filter(function(c){return c.id!==modalCat;});delete state.data[modalCat];delete curSg[modalCat];delete filters[modalCat];curCat=state.cats.length?state.cats[0].id:'';persist();render();showToast('카테고리가 삭제되었습니다');}
+    else{state.data[modalCat].groups=state.data[modalCat].groups.filter(function(g){return g.id!==modalDelTarget;});delete state.data[modalCat].records[modalDelTarget];curSg[modalCat]=state.data[modalCat].groups.length?state.data[modalCat].groups[0].id:null;persist();renderPanels();showToast('그룹이 삭제되었습니다');}
+    return;
+  }
+  if(!val){showToast('이름을 입력해 주세요');return;}
+  if(modalMode==='cat'){var id='cat-'+Date.now();state.cats.push({id:id,name:val});state.data[id]={groups:[],records:{}};filters[id]={from:'',to:''};curCat=id;persist();closeModal();render();showToast('"'+val+'" 카테고리가 추가되었습니다');}
+  else{var id2='sg-'+Date.now();state.data[modalCat].groups.push({id:id2,name:val});state.data[modalCat].records[id2]=[];curSg[modalCat]=id2;persist();closeModal();renderPanels();showToast('"'+val+'" 그룹이 추가되었습니다');}
+}
+
+function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2000);}
+
+document.getElementById('btn-addtab').addEventListener('click',function(){openModal('cat');});
+document.getElementById('modal-cancel').addEventListener('click',closeModal);
+document.getElementById('modal-confirm').addEventListener('click',confirmModal);
+document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+document.getElementById('modal-input').addEventListener('keydown',function(e){if(e.key==='Enter')confirmModal();});
+
+loadFromSheet();
 </script>
 </body>
 </html>
