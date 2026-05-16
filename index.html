@@ -4,188 +4,55 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>인원 기록 보드</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
-    background: #f5f5f3;
-    color: #1a1a1a;
-    min-height: 100vh;
-    padding: 2rem 1rem;
-  }
-
-  .app {
-    max-width: 680px;
-    margin: 0 auto;
-  }
-
-  .header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 1.75rem;
-  }
-  .logo {
-    width: 38px; height: 38px;
-    background: #1D9E75;
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    color: #fff; font-size: 19px;
-  }
-  .h-title { font-size: 20px; font-weight: 600; color: #111; }
-  .h-sub { font-size: 12px; color: #888; margin-top: 2px; }
-
-  /* 탭 */
-  .tabs {
-    display: flex;
-    border-bottom: 1px solid #e2e2e0;
-    margin-bottom: 1.25rem;
-  }
-  .tab {
-    padding: 10px 22px;
-    font-size: 13px; font-weight: 500;
-    cursor: pointer; border: none; background: none;
-    color: #888;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -1px;
-    display: flex; align-items: center; gap: 6px;
-    transition: color .15s, border-color .15s;
-  }
-  .tab.active { color: #0F6E56; border-bottom-color: #1D9E75; }
-  .tab:hover:not(.active) { color: #333; }
-  .cnt {
-    font-size: 11px;
-    background: #efefed;
-    color: #888;
-    border-radius: 10px;
-    padding: 1px 7px;
-    font-weight: 400;
-  }
-  .tab.active .cnt { background: #E1F5EE; color: #0F6E56; }
-
-  /* 패널 */
-  .panel { display: none; }
-  .panel.active { display: block; }
-
-  /* 입력 카드 */
-  .add-card {
-    background: #fff;
-    border: 1px solid #e8e8e6;
-    border-radius: 12px;
-    padding: 1rem 1.25rem;
-    margin-bottom: 1rem;
-  }
-  .add-row {
-    display: grid;
-    grid-template-columns: 140px 1fr 90px auto;
-    gap: 8px;
-    align-items: end;
-  }
-  @media(max-width: 520px) {
-    .add-row { grid-template-columns: 1fr 1fr; }
-    .add-row .field-g:nth-child(2) { grid-column: 1 / -1; }
-    .btn-add { grid-column: 1 / -1; justify-content: center; margin-top: 0; }
-  }
-  .field-g label {
-    display: block;
-    font-size: 11px; font-weight: 600;
-    color: #888;
-    margin-bottom: 4px;
-    letter-spacing: .03em;
-    text-transform: uppercase;
-  }
-  .field-g input {
-    width: 100%;
-    font-size: 13px;
-    padding: 7px 10px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background: #fafaf9;
-    color: #111;
-    font-family: inherit;
-    transition: border-color .15s;
-  }
-  .field-g input:focus { outline: none; border-color: #1D9E75; background: #fff; }
-  .btn-add {
-    display: flex; align-items: center; gap: 6px;
-    padding: 7px 16px;
-    border-radius: 8px;
-    background: #1D9E75; color: #fff;
-    border: none; font-size: 13px; font-weight: 600;
-    cursor: pointer; white-space: nowrap;
-    height: 34px; margin-top: 17px;
-    transition: background .15s;
-  }
-  .btn-add:hover { background: #0F6E56; }
-
-  /* 요약 통계 */
-  .summary-row {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    margin-bottom: 1rem;
-  }
-  .stat {
-    background: #f0f0ee;
-    border-radius: 8px;
-    padding: .75rem 1rem;
-  }
-  .stat-label { font-size: 11px; color: #888; margin-bottom: 3px; }
-  .stat-val { font-size: 22px; font-weight: 600; color: #111; }
-  .stat-unit { font-size: 12px; font-weight: 400; color: #888; }
-
-  /* 기록 리스트 */
-  .records-list { display: flex; flex-direction: column; gap: 6px; }
-  .rec {
-    background: #fff;
-    border: 1px solid #e8e8e6;
-    border-radius: 8px;
-    padding: .75rem 1rem;
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 8px;
-    transition: border-color .15s;
-  }
-  .rec:hover { border-color: #ccc; }
-  .rec-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
-  .rec-date { font-size: 12px; color: #aaa; flex-shrink: 0; width: 82px; }
-  .rec-name {
-    font-size: 13px; color: #111; font-weight: 500;
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  }
-  .rec-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-  .rec-count { font-size: 16px; font-weight: 600; color: #0F6E56; min-width: 44px; text-align: right; }
-  .rec-unit { font-size: 11px; color: #aaa; }
-  .btn-del {
-    background: none; border: none; cursor: pointer;
-    color: #ccc; font-size: 15px; padding: 2px 4px;
-    border-radius: 4px; line-height: 1;
-    transition: color .15s;
-  }
-  .btn-del:hover { color: #c0392b; }
-
-  .empty {
-    text-align: center; padding: 2.5rem 1rem;
-    color: #bbb; font-size: 13px;
-  }
-  .empty span { font-size: 32px; display: block; margin-bottom: .6rem; opacity: .4; }
-
-  /* 토스트 */
-  .toast {
-    position: fixed; bottom: 1.25rem; left: 50%;
-    transform: translateX(-50%);
-    background: #1D9E75; color: #fff;
-    padding: 9px 20px; border-radius: 8px;
-    font-size: 13px; font-weight: 500;
-    z-index: 200; opacity: 0;
-    transition: opacity .25s; pointer-events: none;
-  }
-  .toast.show { opacity: 1; }
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f0;color:#1a1a1a;min-height:100vh;padding:2rem 1rem}
+.wrap{max-width:680px;margin:0 auto}
+.header{display:flex;align-items:center;gap:10px;margin-bottom:1.5rem}
+.logo{width:36px;height:36px;background:#1D9E75;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;flex-shrink:0}
+.h-title{font-size:20px;font-weight:600;color:#111}
+.h-sub{font-size:12px;color:#888;margin-top:2px}
+.tabs{display:flex;border-bottom:1px solid #e0e0d8;margin-bottom:1.25rem}
+.tab{padding:10px 22px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:none;color:#888;border-bottom:2px solid transparent;margin-bottom:-1px;display:flex;align-items:center;gap:6px;transition:all .15s}
+.tab.active{color:#0F6E56;border-bottom-color:#1D9E75}
+.tab:hover:not(.active){color:#333}
+.cnt{font-size:11px;background:#eee;color:#666;border-radius:10px;padding:1px 7px;font-weight:400}
+.tab.active .cnt{background:#E1F5EE;color:#0F6E56}
+.panel{display:none}.panel.active{display:block}
+.add-card{background:#fff;border:1px solid #e8e8e0;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1rem}
+.add-row{display:grid;grid-template-columns:140px 1fr 90px auto;gap:8px;align-items:end}
+.field-g label{display:block;font-size:11px;font-weight:600;color:#666;margin-bottom:4px;letter-spacing:.03em}
+.field-g input{width:100%;font-size:13px;padding:7px 9px;border:1px solid #ddd;border-radius:6px;background:#fff;color:#111;font-family:inherit;outline:none;transition:border-color .15s}
+.field-g input:focus{border-color:#1D9E75}
+.btn-add{display:flex;align-items:center;gap:5px;padding:7px 14px;border-radius:6px;background:#1D9E75;color:#fff;border:none;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;height:34px;margin-top:16px;transition:background .15s}
+.btn-add:hover{background:#0F6E56}
+.summary-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem}
+.stat{background:#f0f0ea;border-radius:8px;padding:.75rem 1rem}
+.stat-label{font-size:11px;color:#777;margin-bottom:3px}
+.stat-val{font-size:22px;font-weight:600;color:#111}
+.stat-unit{font-size:12px;font-weight:400;color:#888}
+.records-list{display:flex;flex-direction:column;gap:6px}
+.rec{background:#fff;border:1px solid #e8e8e0;border-radius:8px;padding:.75rem 1rem;display:flex;align-items:center;justify-content:space-between;gap:8px;transition:border-color .15s}
+.rec:hover{border-color:#bbb}
+.rec-left{display:flex;align-items:center;gap:10px;min-width:0}
+.rec-date{font-size:12px;color:#999;flex-shrink:0;width:80px}
+.rec-name{font-size:13px;color:#111;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rec-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.rec-count{font-size:16px;font-weight:600;color:#0F6E56;min-width:40px;text-align:right}
+.rec-unit{font-size:11px;color:#aaa}
+.btn-del{background:none;border:none;cursor:pointer;color:#ccc;font-size:15px;padding:2px 4px;border-radius:4px;transition:color .15s}
+.btn-del:hover{color:#c0392b}
+.empty{text-align:center;padding:2.5rem 1rem;color:#aaa;font-size:13px}
+.empty i{font-size:32px;display:block;margin-bottom:.6rem;opacity:.4}
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#1D9E75;color:#fff;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:500;z-index:200;opacity:0;transition:opacity .25s;pointer-events:none}
+.toast.show{opacity:1}
 </style>
 </head>
 <body>
-<div class="app">
+<div class="wrap">
   <div class="header">
-    <div class="logo">👥</div>
+    <div class="logo"><i class="ti ti-users"></i></div>
     <div>
       <div class="h-title">인원 기록 보드</div>
       <div class="h-sub">날짜 · 행사명 · 인원수를 기록해요</div>
@@ -193,9 +60,9 @@
   </div>
 
   <div class="tabs">
-    <button class="tab active" onclick="switchTab('biz')">💼 사업 <span class="cnt" id="cnt-biz">0</span></button>
-    <button class="tab" onclick="switchTab('club')">🏃 동아리 <span class="cnt" id="cnt-club">0</span></button>
-    <button class="tab" onclick="switchTab('reg')">📅 정기형 <span class="cnt" id="cnt-reg">0</span></button>
+    <button class="tab active" onclick="switchTab('biz')"><i class="ti ti-briefcase" style="font-size:14px"></i>사업<span class="cnt" id="cnt-biz">0</span></button>
+    <button class="tab" onclick="switchTab('club')"><i class="ti ti-users-group" style="font-size:14px"></i>동아리<span class="cnt" id="cnt-club">0</span></button>
+    <button class="tab" onclick="switchTab('reg')"><i class="ti ti-calendar-repeat" style="font-size:14px"></i>정기형<span class="cnt" id="cnt-reg">0</span></button>
   </div>
 
   <div id="panel-biz" class="panel active"><div id="inner-biz"></div></div>
@@ -206,104 +73,97 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const CATS = ['biz', 'club', 'reg'];
-const STORAGE_KEY = 'attendance-board-v1';
-let data = { biz: [], club: [], reg: [] };
+const CATS=['biz','club','reg'];
+const STORAGE_KEY='attendance-board-v1';
+let data={biz:[],club:[],reg:[]};
 
-function load() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) data = JSON.parse(raw);
-  } catch(e) { data = { biz: [], club: [], reg: [] }; }
+function load(){
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY);
+    if(raw) data=JSON.parse(raw);
+  }catch(e){data={biz:[],club:[],reg:[]};}
   CATS.forEach(renderPanel);
 }
 
-function persist() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
+function persist(){
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(data));}catch(e){}
 }
 
-function today() { return new Date().toISOString().slice(0, 10); }
-function esc(s) {
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
+function today(){return new Date().toISOString().slice(0,10);}
 
-function renderPanel(cat) {
-  const list = data[cat] || [];
-  document.getElementById('cnt-' + cat).textContent = list.length;
-  const total = list.reduce((s, r) => s + Number(r.count || 0), 0);
-  const avg = list.length ? Math.round(total / list.length) : 0;
-  const max = list.length ? Math.max(...list.map(r => Number(r.count || 0))) : 0;
-  const sorted = [...list].sort((a, b) => b.date.localeCompare(a.date));
+function renderPanel(cat){
+  const list=data[cat]||[];
+  document.getElementById('cnt-'+cat).textContent=list.length;
+  const total=list.reduce((s,r)=>s+Number(r.count||0),0);
+  const avg=list.length?Math.round(total/list.length):0;
+  const max=list.length?Math.max(...list.map(r=>Number(r.count||0))):0;
+  const sorted=[...list].sort((a,b)=>b.date.localeCompare(a.date));
 
-  document.getElementById('inner-' + cat).innerHTML = `
+  document.getElementById('inner-'+cat).innerHTML=`
     <div class="add-card">
       <div class="add-row">
         <div class="field-g"><label>날짜</label><input type="date" id="d-${cat}" value="${today()}"></div>
         <div class="field-g"><label>행사 / 모임명</label><input type="text" id="n-${cat}" placeholder="예) 4월 정기모임"></div>
         <div class="field-g"><label>인원 수</label><input type="number" id="c-${cat}" placeholder="0" min="0" style="text-align:center"></div>
-        <button class="btn-add" onclick="addRecord('${cat}')">+ 추가</button>
+        <button class="btn-add" onclick="addRecord('${cat}')"><i class="ti ti-plus"></i>추가</button>
       </div>
     </div>
-    ${list.length ? `
+    ${list.length?`
     <div class="summary-row">
       <div class="stat"><div class="stat-label">총 누적 인원</div><div class="stat-val">${total.toLocaleString()}<span class="stat-unit"> 명</span></div></div>
       <div class="stat"><div class="stat-label">평균 인원</div><div class="stat-val">${avg}<span class="stat-unit"> 명</span></div></div>
       <div class="stat"><div class="stat-label">최대 인원</div><div class="stat-val">${max}<span class="stat-unit"> 명</span></div></div>
-    </div>` : ''}
+    </div>`:''}
     <div class="records-list">
-      ${sorted.length ? sorted.map(r => `
+      ${sorted.length?sorted.map(r=>`
         <div class="rec">
           <div class="rec-left">
-            <div class="rec-date">${esc(r.date)}</div>
+            <div class="rec-date">${r.date}</div>
             <div class="rec-name">${esc(r.name)}</div>
           </div>
           <div class="rec-right">
             <div class="rec-count">${Number(r.count).toLocaleString()}<span class="rec-unit"> 명</span></div>
-            <button class="btn-del" onclick="delRecord('${cat}','${r.id}')" title="삭제">🗑</button>
+            <button class="btn-del" onclick="delRecord('${cat}','${r.id}')"><i class="ti ti-trash"></i></button>
           </div>
         </div>`).join('')
-      : `<div class="empty"><span>📋</span>아직 기록이 없어요<br>위에서 날짜와 인원을 입력해 추가하세요</div>`}
+      :`<div class="empty"><i class="ti ti-clipboard-list"></i>아직 기록이 없어요<br>위에서 날짜와 인원을 입력해 추가하세요</div>`}
     </div>`;
 }
 
-function addRecord(cat) {
-  const date = document.getElementById('d-' + cat).value;
-  const name = document.getElementById('n-' + cat).value.trim();
-  const count = parseInt(document.getElementById('c-' + cat).value) || 0;
-  if (!name) { showToast('행사/모임명을 입력해 주세요'); return; }
-  if (!date) { showToast('날짜를 선택해 주세요'); return; }
-  if (count <= 0) { showToast('인원 수를 입력해 주세요'); return; }
-  const rec = { id: Date.now() + '', date, name, count, ts: Date.now() };
-  data[cat].push(rec);
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function addRecord(cat){
+  const date=document.getElementById('d-'+cat).value;
+  const name=document.getElementById('n-'+cat).value.trim();
+  const count=parseInt(document.getElementById('c-'+cat).value)||0;
+  if(!name){showToast('행사/모임명을 입력해 주세요');return;}
+  if(!date){showToast('날짜를 선택해 주세요');return;}
+  if(count<=0){showToast('인원 수를 입력해 주세요');return;}
+  data[cat].push({id:Date.now()+'',date,name,count,ts:Date.now()});
   persist();
   renderPanel(cat);
-  document.getElementById('n-' + cat).value = '';
-  document.getElementById('c-' + cat).value = '';
-  showToast('기록이 추가되었습니다 ✓');
+  document.getElementById('n-'+cat).value='';
+  document.getElementById('c-'+cat).value='';
+  showToast('기록이 추가되었습니다');
 }
 
-function delRecord(cat, id) {
-  if (!confirm('이 기록을 삭제할까요?')) return;
-  data[cat] = data[cat].filter(r => r.id !== id);
+function delRecord(cat,id){
+  if(!confirm('이 기록을 삭제할까요?'))return;
+  data[cat]=data[cat].filter(r=>r.id!==id);
   persist();
   renderPanel(cat);
   showToast('삭제되었습니다');
 }
 
-function switchTab(cat) {
-  document.querySelectorAll('.tab').forEach((t, i) => {
-    t.classList.toggle('active', CATS[i] === cat);
-  });
-  document.querySelectorAll('.panel').forEach((p, i) => {
-    p.classList.toggle('active', CATS[i] === cat);
-  });
+function switchTab(cat){
+  document.querySelectorAll('.tab').forEach((t,i)=>{t.classList.toggle('active',CATS[i]===cat);});
+  document.querySelectorAll('.panel').forEach((p,i)=>{p.classList.toggle('active',CATS[i]===cat);});
 }
 
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2000);
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
 }
 
 load();
