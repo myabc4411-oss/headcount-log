@@ -188,7 +188,7 @@ function afterLoad(){
 function persist(){saveToSheet();}
 function today(){return new Date().toISOString().slice(0,10);}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function totalRec(catId){var r=state.data[catId]&&state.data[catId].records?state.data[catId].records:{};return Object.values(r).reduce(function(s,a){return s+a.length;},0);}
+function totalRec(catId){return state.data[catId]&&state.data[catId].groups?state.data[catId].groups.length:0;}
 function applyFilter(recs,catId){var f=filters[catId]||{};return recs.filter(function(r){if(f.from&&r.date<f.from)return false;if(f.to&&r.date>f.to)return false;return true;});}
 
 function render(){renderTabs();renderPanels();}
