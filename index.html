@@ -800,7 +800,7 @@ function openEditRec(catId,sgId,recId){
     '<div class="modal-field"><label>날짜</label><input id="er-date" type="date" value="'+rec.date+'"></div>'
     +'<div class="modal-field"><label>행사 / 모임명</label><input id="er-name" type="text" value="'+esc(rec.name)+'"></div>'
     +countTableHtml('er-inp',rec.counts||{},'modal-count-table')
-    +'<div class="modal-field"><label>메모</label><input id="er-memo" type="text" value="'+(rec.memo||')+'" placeholder="특이사항 등"></div>';
+    +'<div class="modal-field"><label>메모</label><input id="er-memo" type="text" value="'+(rec.memo||'')+'" placeholder="특이사항 등"></div>';
   document.getElementById('modal-confirm').textContent='수정 완료';document.getElementById('modal-confirm').className='btn-confirm';
   document.getElementById('modal').style.display='flex';
   setTimeout(function(){updateTotals('er-inp');document.getElementById('er-name').focus();},50);
