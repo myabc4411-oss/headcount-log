@@ -317,11 +317,15 @@ function rowsToState(rows){if(!rows||!rows.length||!rows[0][0])return null;try{r
 
 function loadFromSheet(){
   setStatus('loading','⏳ 불러오는 중...');
-  fetch(API_URL+'?action=load').then(function(r){return r.json();}).then(function(res){
-    if(res.ok&&res.data){var p=rowsToState(res.data);if(p&&p.cats&&p.cats.length)state=p;else initDefault();}
-    else initDefault();
-    afterLoad();setStatus('ok','✅ 동기화됨');
-  }).catch(function(){initDefault();afterLoad();setStatus('error','⚠️ 오프라인 모드');});
+  var controller=new AbortController();
+  var timeout=setTimeout(function(){controller.abort();},8000);
+  fetch(API_URL+'?action=load',{signal:controller.signal})
+    .then(function(r){clearTimeout(timeout);return r.json();})
+    .then(function(res){
+      if(res.ok&&res.data){var p=rowsToState(res.data);if(p&&p.cats&&p.cats.length)state=p;else initDefault();}
+      else initDefault();
+      afterLoad();setStatus('ok','✅ 동기화됨');
+    }).catch(function(){clearTimeout(timeout);initDefault();afterLoad();setStatus('error','⚠️ 오프라인 모드');});
 }
 
 function saveToSheet(){
